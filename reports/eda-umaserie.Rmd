@@ -26,38 +26,49 @@ Ler os dados:
 all_series = read_csv(here("data/series_from_imdb.csv.zip"), 
                       col_types = "ccdcdcdddddddddddd") 
 
-glimpse(all_series)
+#glimpse(all_series)
 
 episodes = all_series %>% 
-    filter(series_name == "Stranger Things") 
+    filter(series_name %in% c("Vikings", "BoJack Horseman", "Prison Break")) 
 
-glimpse(episodes)
+#glimpse(episodes)
+
+vk = episodes %>% filter(series_name == "Vikings")
+pb = episodes %>% filter(series_name == "Prison Break")
+bh = episodes %>% filter(series_name == "BoJack Horseman")
 ```
 
 Estamos interessados nas variáveis `UserRating` e `UserVotes`, principalmente.
 
-## Quais os valores que existem de notas? 
+## Quais os valores que existem de notas por faixa? 
 
 ```{r}
-episodes %>% 
-  mutate(season = as.character(season)) %>% 
-  ggplot(mapping = aes(x = season, y = UserRating)) + 
-  geom_point()
-  
-```
-
-E por faixas de valor?
-
-```{r}
-episodes %>% 
+vk %>% 
   mutate(season = as.character(season)) %>% 
   ggplot(mapping = aes(x = UserRating)) + 
   geom_histogram(binwidth = 0.5, 
                  boundary = 6,
                  color = "black", 
-                 fill = "salmon") + 
+                 fill = "red") + 
   geom_rug()
 
+pb %>% 
+  mutate(season = as.character(season)) %>% 
+  ggplot(mapping = aes(x = UserRating)) + 
+  geom_histogram(binwidth = 0.5, 
+                 boundary = 6,
+                 color = "black", 
+                 fill = "blue") + 
+  geom_rug()
+
+bh %>% 
+  mutate(season = as.character(season)) %>% 
+  ggplot(mapping = aes(x = UserRating)) + 
+  geom_histogram(binwidth = 0.5, 
+                 boundary = 6,
+                 color = "black", 
+                 fill = "purple") + 
+  geom_rug()
 ```
 
 ## Quais valores existem para número de votos?
