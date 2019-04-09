@@ -1,11 +1,11 @@
 ---
-title: "EDA Stranger Things"
+title: "EDA Séries"
 output:
-  html_notebook:
-    toc: yes
-    toc_float: yes
   html_document:
     df_print: paged
+    toc: yes
+    toc_float: yes
+  html_notebook:
     toc: yes
     toc_float: yes
 ---
@@ -18,7 +18,7 @@ theme_set(theme_bw())
 
 ## Objetivo
 
-Explorar as avaliações dos episódios da série Stranger Things. Houve duas temporadas: quais foram os melhores episódios? A melhor temporada?
+Explorar as avaliações das séries Bojack Horseman, Prison Break e Vikings, todas com 5 temporadas cada.
 
 Ler os dados:
 
@@ -26,79 +26,162 @@ Ler os dados:
 all_series = read_csv(here("data/series_from_imdb.csv.zip"), 
                       col_types = "ccdcdcdddddddddddd") 
 
-glimpse(all_series)
+#glimpse(all_series)
 
 episodes = all_series %>% 
-    filter(series_name == "Stranger Things") 
+    filter(series_name %in% c("Vikings", "BoJack Horseman", "Prison Break")) 
 
-glimpse(episodes)
+#glimpse(episodes)
+
+bh = episodes %>% filter(series_name == "BoJack Horseman")
+pb = episodes %>% filter(series_name == "Prison Break")
+vk = episodes %>% filter(series_name == "Vikings")
+
+bh_1 = bh %>% filter(season == 1)
+bh_2 = bh %>% filter(season == 2)
+bh_3 = bh %>% filter(season == 3)
+bh_4 = bh %>% filter(season == 4)
+bh_5 = bh %>% filter(season == 5)
+
+pb_1 = pb %>% filter(season == 1)
+pb_2 = pb %>% filter(season == 2)
+pb_3 = pb %>% filter(season == 3)
+pb_4 = pb %>% filter(season == 4)
+pb_5 = pb %>% filter(season == 5)
+
+vk_1 = vk %>% filter(season == 1)
+vk_2 = vk %>% filter(season == 2)
+vk_3 = vk %>% filter(season == 3)
+vk_4 = vk %>% filter(season == 4)
+vk_5 = vk %>% filter(season == 5)
+
+episodes_min = data.frame(matrix(
+    c("BoJack Horseman", bh$season[match(min(bh$UserRating), bh$UserRating)], min(bh$UserRating), 
+      "Prison Break",    pb$season[match(min(pb$UserRating), pb$UserRating)], min(pb$UserRating),
+      "Vikings",         vk$season[match(min(vk$UserRating), vk$UserRating)], min(vk$UserRating)),
+    ncol = 3, 
+    byrow = TRUE))
+colnames(episodes_min) = c("series_name", "season", "UserRating")
+
+
+episodes_final = data.frame(matrix(
+    c("BoJack Horseman", 1, bh_1$UserRating[match(max(bh_1$series_ep), bh_1$series_ep)], median(bh_1$UserRating),
+      "BoJack Horseman", 2, bh_2$UserRating[match(max(bh_2$series_ep), bh_2$series_ep)], median(bh_2$UserRating),
+      "BoJack Horseman", 3, bh_3$UserRating[match(max(bh_3$series_ep), bh_3$series_ep)], median(bh_3$UserRating),
+      "BoJack Horseman", 4, bh_4$UserRating[match(max(bh_4$series_ep), bh_4$series_ep)], median(bh_4$UserRating),
+      "BoJack Horseman", 5, bh_5$UserRating[match(max(bh_5$series_ep), bh_5$series_ep)], median(bh_5$UserRating),
+      "Prison Break",    1, pb_1$UserRating[match(max(pb_1$series_ep), pb_1$series_ep)], median(pb_1$UserRating),
+      "Prison Break",    2, pb_2$UserRating[match(max(pb_2$series_ep), pb_2$series_ep)], median(pb_2$UserRating),
+      "Prison Break",    3, pb_3$UserRating[match(max(pb_3$series_ep), pb_3$series_ep)], median(pb_3$UserRating),
+      "Prison Break",    4, pb_4$UserRating[match(max(pb_4$series_ep), pb_4$series_ep)], median(pb_4$UserRating),
+      "Prison Break",    5, pb_5$UserRating[match(max(pb_5$series_ep), pb_5$series_ep)], median(pb_5$UserRating),
+      "Vikings",         1, vk_1$UserRating[match(max(vk_1$series_ep), vk_1$series_ep)], median(vk_1$UserRating),
+      "Vikings",         2, vk_2$UserRating[match(max(vk_2$series_ep), vk_2$series_ep)], median(vk_2$UserRating),
+      "Vikings",         3, vk_3$UserRating[match(max(vk_3$series_ep), vk_3$series_ep)], median(vk_3$UserRating),
+      "Vikings",         4, vk_4$UserRating[match(max(vk_4$series_ep), vk_4$series_ep)], median(vk_4$UserRating),
+      "Vikings",         5, vk_5$UserRating[match(max(vk_5$series_ep), vk_5$series_ep)], median(vk_5$UserRating)),
+    ncol = 4, 
+    byrow = TRUE))
+colnames(episodes_final) = c("series_name", "season", "UserRating", "median")
 ```
 
-Estamos interessados nas variáveis `UserRating` e `UserVotes`, principalmente.
+Estamos interessado nas variáveis `UserRating` e `UserVotes`, principalmente.
 
-## Quais os valores que existem de notas? 
+## Em quais temporadas se encontram o pior episódio de cada série? 
 
 ```{r}
-episodes %>% 
+episodes_min %>% 
   mutate(season = as.character(season)) %>% 
-  ggplot(mapping = aes(x = season, y = UserRating)) + 
+  ggplot(mapping = aes(x = season, y = UserRating, color = series_name)) + 
   geom_point()
-  
 ```
 
-E por faixas de valor?
+No momento em que a pergunta foi definida era esperado que o pior episódio de cada série estaria em uma temporada mais próxima do final da série. O resultado confirmou isso, com exceção para a série Bojack Horseman.
+Pensando nisso, surge a curiosidade de como as séries evoluem conforme as temporadas passam, em especial para Bojack Horseman.
+
+## Como a avaliação das séries selecionadas evoluem conforme as temporadas passam?
 
 ```{r}
 episodes %>% 
   mutate(season = as.character(season)) %>% 
-  ggplot(mapping = aes(x = UserRating)) + 
-  geom_histogram(binwidth = 0.5, 
-                 boundary = 6,
-                 color = "black", 
-                 fill = "salmon") + 
-  geom_rug()
+  ggplot(mapping = aes(x = series_ep, y = UserRating, color = series_name)) + 
+  geom_line()
 
-```
-
-## Quais valores existem para número de votos?
-
-```{r}
-episodes %>% 
+bh %>% 
   mutate(season = as.character(season)) %>% 
-  ggplot(mapping = aes(x = season, y = UserVotes)) + 
-  geom_point()
-```
+  ggplot(mapping = aes(x = series_ep, y = UserRating, color = season)) + 
+  geom_line()
 
-```{r}
-episodes %>% 
+pb %>% 
   mutate(season = as.character(season)) %>% 
-  ggplot(mapping = aes(x = UserVotes)) + 
-  geom_histogram(binwidth = 1000, 
-                 boundary = 10000,
-                 color = "black", 
-                 fill = "darkorange") + 
-  geom_rug()
-```
+  ggplot(mapping = aes(x = series_ep, y = UserRating, color = season)) + 
+  geom_line()
 
-Temos um episódio bem mais avaliado que os demais.
-
-
-## Qual é esse episódio tão mal avaliado?
-
-```{r}
-episodes %>% 
+vk %>% 
   mutate(season = as.character(season)) %>% 
   ggplot(mapping = aes(x = series_ep, y = UserRating, color = season)) + 
   geom_line()
 ```
 
-E qual aquele com mais avaliações?
+Novamente, o resultado esperado se confirmou, com exceção da série Bojack Horseman. Prison Break passou por uma queda constante na avaliação pública e Vikings caiu oscilando bastante na última temporada, mas Bojack Horseman manteve uma avaliação crescente com o decorrer das temporadas.
+Esse resultado contribui para entendermos melhor o primeiro questionamento.
+
+E o número de avaliações?
 
 ```{r}
 episodes %>% 
+  mutate(season = as.character(season)) %>% 
+  ggplot(mapping = aes(x = series_ep, y = UserVotes, color = series_name)) + 
+  geom_line()
+
+bh %>% 
+  mutate(season = as.character(season)) %>% 
+  ggplot(mapping = aes(x = series_ep, y = UserVotes, color = season)) + 
+  geom_line()
+
+pb %>% 
+  mutate(season = as.character(season)) %>% 
+  ggplot(mapping = aes(x = series_ep, y = UserVotes, color = season)) + 
+  geom_line()
+
+vk %>% 
   mutate(season = as.character(season)) %>% 
   ggplot(mapping = aes(x = series_ep, y = UserVotes, color = season)) + 
   geom_line()
 ```
 
-Alguma coisa aconteceu no episódio 15...
+Aqui não identificamos uma forte relação entre a nota do episódio e a quantidade de vezes em que ele foi avaliado. Logo, somos levados a analisar a relação direta entre essas duas variáveis.
+
+## Qual a relação entre a quantidade de vezes em que o episódio foi avaliado e sua nota? As pessoas se mobilizam mais para criticar algo que não gostaram?
+
+```{r}
+episodes %>% 
+  ggplot(mapping = aes(x = UserRating, y = UserVotes, color = series_name)) + 
+  geom_line()
+
+bh %>% 
+  ggplot(mapping = aes(x = UserRating, y = UserVotes)) + 
+  geom_line()
+
+pb %>% 
+  ggplot(mapping = aes(x = UserRating, y = UserVotes)) + 
+  geom_line()
+
+vk %>% 
+  ggplot(mapping = aes(x = UserRating, y = UserVotes)) + 
+  geom_line()
+```
+
+Como identificado na pergunta anterior, não existe uma forte relação entre o número de avaliações e a nota de um episódio, isso principalmente para os episódios com uma avaliação que não se destaca na curva, pois os episódios que apresentam as melhores avaliações da série foram também uns dos mais avaliados pelo público.
+Também, o resultado obtido indica as pessoas não tendem a se mobilizar mais para criticar algo que não aprovaram.
+
+## O que as pessoas acham do final de cada temporada?
+
+```{r}
+episodes_final %>%
+  mutate(season = as.character(season)) %>% 
+  ggplot(mapping = aes(x = median, y = UserRating, color = series_name)) + 
+  geom_point()
+```
+
+Através do gráfico está evidenciado que os episódios de encerramento de uma temporada recebem melhores avaliações do que os episódios do restante da temporada costumam receber.
