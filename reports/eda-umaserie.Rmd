@@ -1,5 +1,5 @@
 ---
-title: "EDA Stranger Things"
+title: "EDA Séries"
 output:
   html_notebook:
     toc: yes
@@ -43,7 +43,7 @@ Estamos interessados nas variáveis `UserRating` e `UserVotes`, principalmente.
 ## Quais os valores que existem de notas por faixa? 
 
 ```{r}
-vk %>% 
+bh %>% 
   mutate(season = as.character(season)) %>% 
   ggplot(mapping = aes(x = UserRating)) + 
   geom_histogram(binwidth = 0.5, 
@@ -61,7 +61,7 @@ pb %>%
                  fill = "blue") + 
   geom_rug()
 
-bh %>% 
+vk %>% 
   mutate(season = as.character(season)) %>% 
   ggplot(mapping = aes(x = UserRating)) + 
   geom_histogram(binwidth = 0.5, 
@@ -76,12 +76,45 @@ bh %>%
 ```{r}
 episodes %>% 
   mutate(season = as.character(season)) %>% 
+  ggplot(mapping = aes(x = season, y = UserVotes, color = series_name)) + 
+  geom_point()
+
+bh %>% 
+  mutate(season = as.character(season)) %>% 
+  ggplot(mapping = aes(x = season, y = UserVotes)) + 
+  geom_point()
+
+pb %>% 
+  mutate(season = as.character(season)) %>% 
+  ggplot(mapping = aes(x = season, y = UserVotes)) + 
+  geom_point()
+
+vk %>% 
+  mutate(season = as.character(season)) %>% 
   ggplot(mapping = aes(x = season, y = UserVotes)) + 
   geom_point()
 ```
 
 ```{r}
-episodes %>% 
+bh %>% 
+  mutate(season = as.character(season)) %>% 
+  ggplot(mapping = aes(x = UserVotes)) + 
+  geom_histogram(binwidth = 1000, 
+                 boundary = 10000,
+                 color = "black", 
+                 fill = "darkorange") + 
+  geom_rug()
+
+pb %>% 
+  mutate(season = as.character(season)) %>% 
+  ggplot(mapping = aes(x = UserVotes)) + 
+  geom_histogram(binwidth = 1000, 
+                 boundary = 10000,
+                 color = "black", 
+                 fill = "darkorange") + 
+  geom_rug()
+
+vk %>% 
   mutate(season = as.character(season)) %>% 
   ggplot(mapping = aes(x = UserVotes)) + 
   geom_histogram(binwidth = 1000, 
@@ -99,6 +132,21 @@ Temos um episódio bem mais avaliado que os demais.
 ```{r}
 episodes %>% 
   mutate(season = as.character(season)) %>% 
+  ggplot(mapping = aes(x = series_ep, y = UserRating, color = series_name)) + 
+  geom_line()
+
+bh %>% 
+  mutate(season = as.character(season)) %>% 
+  ggplot(mapping = aes(x = series_ep, y = UserRating, color = season)) + 
+  geom_line()
+
+pb %>% 
+  mutate(season = as.character(season)) %>% 
+  ggplot(mapping = aes(x = series_ep, y = UserRating, color = season)) + 
+  geom_line()
+
+vk %>% 
+  mutate(season = as.character(season)) %>% 
   ggplot(mapping = aes(x = series_ep, y = UserRating, color = season)) + 
   geom_line()
 ```
@@ -108,8 +156,21 @@ E qual aquele com mais avaliações?
 ```{r}
 episodes %>% 
   mutate(season = as.character(season)) %>% 
+  ggplot(mapping = aes(x = series_ep, y = UserVotes, color = series_name)) + 
+  geom_line()
+
+bh %>% 
+  mutate(season = as.character(season)) %>% 
+  ggplot(mapping = aes(x = series_ep, y = UserVotes, color = season)) + 
+  geom_line()
+
+pb %>% 
+  mutate(season = as.character(season)) %>% 
+  ggplot(mapping = aes(x = series_ep, y = UserVotes, color = season)) + 
+  geom_line()
+
+vk %>% 
+  mutate(season = as.character(season)) %>% 
   ggplot(mapping = aes(x = series_ep, y = UserVotes, color = season)) + 
   geom_line()
 ```
-
-Alguma coisa aconteceu no episódio 15...
