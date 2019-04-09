@@ -33,9 +33,9 @@ episodes = all_series %>%
 
 #glimpse(episodes)
 
-vk = episodes %>% filter(series_name == "Vikings")
-pb = episodes %>% filter(series_name == "Prison Break")
 bh = episodes %>% filter(series_name == "BoJack Horseman")
+pb = episodes %>% filter(series_name == "Prison Break")
+vk = episodes %>% filter(series_name == "Vikings")
 ```
 
 Estamos interessados nas variáveis `UserRating` e `UserVotes`, principalmente.
