@@ -18,7 +18,7 @@ theme_set(theme_bw())
 
 ## Objetivo
 
-Explorar as avaliações dos episódios da série Stranger Things. Houve duas temporadas: quais foram os melhores episódios? A melhor temporada?
+Explorar as avaliações das séries Bojack Horseman, Prison Break e Vikings, todas com 5 temporadas cada.
 
 Ler os dados:
 
@@ -36,98 +36,31 @@ episodes = all_series %>%
 bh = episodes %>% filter(series_name == "BoJack Horseman")
 pb = episodes %>% filter(series_name == "Prison Break")
 vk = episodes %>% filter(series_name == "Vikings")
+
+episodes_min = data.frame(matrix(
+    c("BoJack Horseman", bh$season[match(min(bh$UserRating), bh$UserRating)], min(bh$UserRating), 
+      "Prison Break",    pb$season[match(min(pb$UserRating), pb$UserRating)], min(pb$UserRating),
+      "Vikings",         vk$season[match(min(vk$UserRating), vk$UserRating)], min(vk$UserRating)),
+    ncol = 3, 
+    byrow = TRUE))
+colnames(episodes_min) = c("series_name", "season", "UserRating")
 ```
 
-Estamos interessados nas variáveis `UserRating` e `UserVotes`, principalmente.
+Estamos interessado nas variáveis `UserRating` e `UserVotes`, principalmente.
 
-## Quais os valores que existem de notas por faixa? 
+## Em quais temporadas se encontram o pior episódio de cada série? 
 
 ```{r}
-bh %>% 
+episodes_min %>% 
   mutate(season = as.character(season)) %>% 
-  ggplot(mapping = aes(x = UserRating)) + 
-  geom_histogram(binwidth = 0.5, 
-                 boundary = 6,
-                 color = "black", 
-                 fill = "red") + 
-  geom_rug()
-
-pb %>% 
-  mutate(season = as.character(season)) %>% 
-  ggplot(mapping = aes(x = UserRating)) + 
-  geom_histogram(binwidth = 0.5, 
-                 boundary = 6,
-                 color = "black", 
-                 fill = "blue") + 
-  geom_rug()
-
-vk %>% 
-  mutate(season = as.character(season)) %>% 
-  ggplot(mapping = aes(x = UserRating)) + 
-  geom_histogram(binwidth = 0.5, 
-                 boundary = 6,
-                 color = "black", 
-                 fill = "purple") + 
-  geom_rug()
-```
-
-## Quais valores existem para número de votos?
-
-```{r}
-episodes %>% 
-  mutate(season = as.character(season)) %>% 
-  ggplot(mapping = aes(x = season, y = UserVotes, color = series_name)) + 
-  geom_point()
-
-bh %>% 
-  mutate(season = as.character(season)) %>% 
-  ggplot(mapping = aes(x = season, y = UserVotes)) + 
-  geom_point()
-
-pb %>% 
-  mutate(season = as.character(season)) %>% 
-  ggplot(mapping = aes(x = season, y = UserVotes)) + 
-  geom_point()
-
-vk %>% 
-  mutate(season = as.character(season)) %>% 
-  ggplot(mapping = aes(x = season, y = UserVotes)) + 
+  ggplot(mapping = aes(x = season, y = UserRating, color = series_name)) + 
   geom_point()
 ```
 
-```{r}
-bh %>% 
-  mutate(season = as.character(season)) %>% 
-  ggplot(mapping = aes(x = UserVotes)) + 
-  geom_histogram(binwidth = 1000, 
-                 boundary = 10000,
-                 color = "black", 
-                 fill = "darkorange") + 
-  geom_rug()
+No momento em que a pergunta foi definida era esperado que o pior episódio de cada série estaria em uma temporada mais próxima do final da série. O resultado confirmou isso, com exceção para a série Bojack Horseman.
+Pensando nisso, surge a curiosidade de como as séries evoluem conforme as temporadas passam, em especial para Bojack Horseman.
 
-pb %>% 
-  mutate(season = as.character(season)) %>% 
-  ggplot(mapping = aes(x = UserVotes)) + 
-  geom_histogram(binwidth = 1000, 
-                 boundary = 10000,
-                 color = "black", 
-                 fill = "darkorange") + 
-  geom_rug()
-
-vk %>% 
-  mutate(season = as.character(season)) %>% 
-  ggplot(mapping = aes(x = UserVotes)) + 
-  geom_histogram(binwidth = 1000, 
-                 boundary = 10000,
-                 color = "black", 
-                 fill = "darkorange") + 
-  geom_rug()
-```
-
-Temos um episódio bem mais avaliado que os demais.
-
-
-## Qual é esse episódio tão mal avaliado?
+## Como a avaliação das séries selecionadas evoluem conforme as temporadas passam?
 
 ```{r}
 episodes %>% 
@@ -151,7 +84,10 @@ vk %>%
   geom_line()
 ```
 
-E qual aquele com mais avaliações?
+Novamente, o resultado esperado se confirmou, com exceção da série Bojack Horseman. Prison Break passou por uma queda constante na avaliação pública e Vikings caiu oscilando bastante na última temporada, mas Bojack Horseman manteve uma avaliação crescente com o decorrer das temporadas.
+Esse resultado contribui para entendermos melhor o primeiro questionamento.
+
+E o número de avaliações?
 
 ```{r}
 episodes %>% 
@@ -174,3 +110,35 @@ vk %>%
   ggplot(mapping = aes(x = series_ep, y = UserVotes, color = season)) + 
   geom_line()
 ```
+
+Aqui não identificamos uma forte relação entre a nota do episódio e a quantidade de vezes em que ele foi avaliado. Logo, somos levados a analisar a relação direta entre essas duas variáveis.
+
+## Qual a relação entre a quantidade de vezes em que o episódio foi avaliado e sua nota? As pessoas se mobilizam mais para criticar algo que não gostaram?
+
+```{r}
+episodes %>% 
+  ggplot(mapping = aes(x = UserRating, y = UserVotes, color = series_name)) + 
+  geom_line()
+
+bh %>% 
+  ggplot(mapping = aes(x = UserRating, y = UserVotes)) + 
+  geom_line()
+
+pb %>% 
+  ggplot(mapping = aes(x = UserRating, y = UserVotes)) + 
+  geom_line()
+
+vk %>% 
+  ggplot(mapping = aes(x = UserRating, y = UserVotes)) + 
+  geom_line()
+```
+
+Como identificado na pergunta anterior, não existe uma forte relação entre o número de avaliações e a nota de um episódio, isso principalmente para os episódios com uma avaliação que não se destaca na curva, pois os episódios que apresentam as melhores avaliações da série foram também uns dos mais avaliados pelo público.
+Também, o resultado obtido indica as pessoas não tendem a se mobilizar mais para criticar algo que não aprovaram.
+
+## O que as pessoas acham do final de cada temporada?
+
+```{r}
+
+```
+
