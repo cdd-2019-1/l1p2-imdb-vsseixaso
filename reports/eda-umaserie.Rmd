@@ -16,6 +16,9 @@ library(here)
 theme_set(theme_bw())
 ```
 
+Grupo: Vinícius Souza Seixas de Oliveira
+
+
 ## Objetivo
 
 Explorar as avaliações das séries Bojack Horseman, Prison Break e Vikings, todas com 5 temporadas cada.
@@ -167,3 +170,23 @@ episodes_final %>%
 ```
 
 Através do gráfico está evidenciado que os episódios de encerramento de uma temporada recebem melhores avaliações do que os episódios do restante da temporada costumam receber.
+
+## Existe um episódio extremamente odiado e amado pelo público?
+
+```{r}
+episodes %>%
+    mutate(season = as.character(season)) %>%
+    ggplot(mapping = aes(x = r1, y = r10, color = series_name)) +
+    geom_point() +
+    geom_abline() +
+    scale_x_continuous(
+        name = "Episódio com percentual de nota mínima ", 
+        limits = c(0, 1), 
+        breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1)) +
+    scale_y_continuous(
+        name = "Episódio com percentual de nota máxima",
+        limits = c(0, 1), 
+        breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1))
+```
+
+Concluímos que não, pois nenhum episódio se aproxima da reta x = y com um alto percentual.
