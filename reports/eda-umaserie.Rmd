@@ -16,6 +16,9 @@ library(here)
 theme_set(theme_bw())
 ```
 
+Grupo: Vinícius Souza Seixas de Oliveira
+
+
 ## Objetivo
 
 Explorar as avaliações das séries Bojack Horseman, Prison Break e Vikings, todas com 5 temporadas cada.
@@ -150,38 +153,40 @@ vk %>%
   geom_line()
 ```
 
-Aqui não identificamos uma forte relação entre a nota do episódio e a quantidade de vezes em que ele foi avaliado. Logo, somos levados a analisar a relação direta entre essas duas variáveis.
-
-## Qual a relação entre a quantidade de vezes em que o episódio foi avaliado e sua nota? As pessoas se mobilizam mais para criticar algo que não gostaram?
-
-```{r}
-episodes %>% 
-  ggplot(mapping = aes(x = UserRating, y = UserVotes, color = series_name)) + 
-  geom_line()
-
-bh %>% 
-  ggplot(mapping = aes(x = UserRating, y = UserVotes)) + 
-  geom_line()
-
-pb %>% 
-  ggplot(mapping = aes(x = UserRating, y = UserVotes)) + 
-  geom_line()
-
-vk %>% 
-  ggplot(mapping = aes(x = UserRating, y = UserVotes)) + 
-  geom_line()
-```
-
-Como identificado na pergunta anterior, não existe uma forte relação entre o número de avaliações e a nota de um episódio, isso principalmente para os episódios com uma avaliação que não se destaca na curva, pois os episódios que apresentam as melhores avaliações da série foram também uns dos mais avaliados pelo público.
-Também, o resultado obtido indica as pessoas não tendem a se mobilizar mais para criticar algo que não aprovaram.
+Aqui não identificamos uma forte relação entre a nota do episódio e a quantidade de vezes em que ele foi avaliado.
 
 ## O que as pessoas acham do final de cada temporada?
 
 ```{r}
 episodes_final %>%
-  mutate(season = as.character(season)) %>% 
+  mutate(season = as.character(season), 
+         median = as.numeric(levels(median))[median], 
+         UserRating = as.numeric(levels(UserRating))[UserRating]) %>% 
   ggplot(mapping = aes(x = median, y = UserRating, color = series_name)) + 
-  geom_point()
+  geom_point() +
+  geom_abline() +
+  scale_x_continuous(name = "UserRating para a Temporada", limits = c(7.5, 9.5), breaks = c(7.5, 8, 8.5, 9, 9.5)) +
+  scale_y_continuous(name = "UserRating para o Último Ep. de cada Temporada", limits = c(7.5, 9.5), breaks = c(7.5, 8, 8.5, 9, 9.5))
 ```
 
 Através do gráfico está evidenciado que os episódios de encerramento de uma temporada recebem melhores avaliações do que os episódios do restante da temporada costumam receber.
+
+## Existe um episódio extremamente odiado e amado pelo público?
+
+```{r}
+episodes %>%
+    mutate(season = as.character(season)) %>%
+    ggplot(mapping = aes(x = r1, y = r10, color = series_name)) +
+    geom_point() +
+    geom_abline() +
+    scale_x_continuous(
+        name = "Episódio com percentual de nota mínima ", 
+        limits = c(0, 1), 
+        breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1)) +
+    scale_y_continuous(
+        name = "Episódio com percentual de nota máxima",
+        limits = c(0, 1), 
+        breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1))
+```
+
+Concluímos que não, pois nenhum episódio se aproxima da reta x = y com um alto percentual.
